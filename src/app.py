@@ -38,14 +38,29 @@ def sitemap():
 
 @app.route('/user', methods=['GET'])
 def handle_hello():
+    all_user = User.query.all()
+    serialize_all_user = list(map(lambda user: user.to_json(), all_user))
+    print(all_user)
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+    return jsonify(serialize_all_user), 200
 
-    return jsonify(response_body), 200
+@app.route('/user/<int:id>', methods=['GET'])
+def get_user(id):
+    print(id)
+    user = User.query.get(id)
+    print(user)
+    return jsonify(user.to_json()), 200
+
+@app.route('/user', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    new_user = User(data['email'], data['password'], data['username'])
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify("HOLA SOY EL post DE LA RUTA user"), 200
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
-    PORT = int(os.environ.get('PORT', 3000))
-    app.run(host='0.0.0.0', port=PORT, debug=False)
+    PORT = int( 3001)
+    app.run(host='0.0.0.0', port=3001, debug=False)
